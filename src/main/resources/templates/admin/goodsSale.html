@@ -1,0 +1,250 @@
+<!-- Copyright (c) 2019-2020 十三 all rights reserved. -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment"></header>
+<body class="hold-transition sidebar-mini" onload="time()">
+	<div class="wrapper">
+		<!-- 引入页面头header-fragment -->
+		<div th:replace="admin/header::header-nav"></div>
+		<!-- 引入工具栏sidebar-fragment -->
+		<div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<div class="content-header">
+				<div class="container-fluid">
+				</div><!-- /.container-fluid -->
+			</div>
+			<!-- Main content -->
+			<div class="content">
+				<div class="container-fluid">
+					<div class="card card-primary card-outline">
+						<div class="card-header">
+							<h3 class="card-title">キャンペーン管理</h3>
+							 <h2 id="showtime"></h2>
+						</div>
+						
+						<div class="card-body"> <!-- /.card-body -->
+							<div class="col-sm-4"> </div>
+							<div class="grid-btn">
+								<button class="btn btn-info" id="modal-open"> 
+										<i class="fa fa-plus" id="shinnki"> </i>&nbsp;新規追加
+								</button>&nbsp;&nbsp;&nbsp;&nbsp;
+									
+								<button class="btn btn-info" id="col-120" onclick="csvUpload()"><i
+										class="fa fa-pencil-square-o"></i>&nbsp;CSV登録
+								</button>
+							</div>
+						<!--	<div>
+								<span id="col-119">
+								す べ て
+								</span>
+								
+								<span id="col-119">&nbsp;クローズ
+								</span>
+							 
+							</div>-->
+							<br>
+							<div>
+								<div class="col-6">
+									<div class="input-group">
+									<div class="inputsale">
+										<select class="custom-select" id="inputGroupSelect04">
+											<option value="selected">Choose...</option>
+											<option value="txt">ファイル (.txt)</option>
+										 	<option value="csv">ファイル (.csv)</option>
+									    </select>
+									    </div>&nbsp;&nbsp;
+										<button id="downloadsale"
+										type="button">Download</button>
+									</div>
+									<iframe id="my_iframe"></iframe>
+								</div>
+								<div class="downloadttt">
+									<div class="col-6">
+										<div class="col-7">
+											<input type="search" class="light-table-filter" id="searchSale" placeholder="絞り込み検索" />&nbsp;
+											<button type="button" id="kennsaku">絞り込み検索</button>
+											<div class="search_hot"> </div>
+										</div>
+									</div>
+							</div>
+							<div class="campaignTable">
+								<table class="order-table" border="1">
+									<thead class="biaotou">
+										<tr>
+											<th class="col-1" id="0"><span id="sort0" sort=""></span>
+												<input type="checkbox" name="select-all" id="select-all" />Toggle All<br/>
+											</th>
+											<th class="col-1" id="1">Campaign ID<span id="sort1" sort=""></span></th>
+											<th class="col-2" id="2">Campaign Name<span id="sort2" sort=""></span></th>
+											<th class="col-2" id="3">開始時間<span id="sort3" sort=""></span></th>
+											<th class="col-2" id="4">終了時間<span id="sort4" sort=""></span></th>
+											<th class="col-2" id="5">ステータス<span id="sort5" sort=""></span></th>
+										</tr>
+									</thead>
+									<tbody>
+										<th:block th:unless="${#lists.isEmpty(pageResult.list)}">
+						          <th:block th:each="goodsSale:${pageResult.list}">
+						            <tr>
+						             <td class="col-1">
+						                    <input type="checkbox"/>
+						                </td>
+						                <td class="col-1" th:text="${goodsSale.id}"></td>
+						                <td class="col-1" th:text="${goodsSale.name}"></td>
+						                <td class="col-1" th:text="${#dates.format(goodsSale.startDate, 'yyyy-MM-dd')}"></td>
+						                <td class="col-1" th:text="${#dates.format(goodsSale.endDate, 'yyyy-MM-dd')}"></td>
+						                <td class="col-1" th:text="${goodsSale.flag}"></td>
+						            </tr>
+						             </th:block>
+						             </th:block>
+								</tbody>
+							   </table>
+							 </div>
+						</div>
+							<div class="page_wrap">
+								<th:block th:if="${null != pageResult and !#lists.isEmpty(pageResult.list)}">
+									<span class="page_span1">
+										<a
+											th:href="@{${pageResult.currPage==1}?'##':'/admin/goods/sale?keyword='+${keyword==null?'':keyword}+'&page=' + ${pageResult.currPage-1}+'&orderBy='+${orderBy==null?'':orderBy}}">
+											< 前ページ </a>
+												<th:block th:if="${pageResult.currPage-2 >=1}"><a
+														th:href="@{'/admin/goods/sale?keyword='+${keyword==null?'':keyword}+'&page=' + ${pageResult.currPage-2}+'&orderBy='+${orderBy==null?'':orderBy}}"
+														th:text="${pageResult.currPage -2}">1</a></th:block>
+												<th:block th:if="${pageResult.currPage-1 >=1}"><a
+														th:href="@{'/admin/goods/sale?keyword='+${keyword==null?'':keyword}+'&page=' + ${pageResult.currPage-1}+'&orderBy='+${orderBy==null?'':orderBy}}"
+														th:text="${pageResult.currPage -1}">1</a></th:block>
+												<a href="##" class="active" th:text="${pageResult.currPage}">1</a>
+												<th:block th:if="${pageResult.currPage+1<=pageResult.totalPage}"><a
+														th:href="@{'/admin/goods/sale?keyword='+${keyword==null?'':keyword}+'&page=' + ${pageResult.currPage+1}+'&orderBy='+${orderBy==null?'':orderBy}}"
+														th:text="${pageResult.currPage +1}">1</a></th:block>
+												<th:block th:if="${pageResult.currPage+2<=pageResult.totalPage}"><a
+														th:href="@{'/admin/goods/sale?keyword='+${keyword==null?'':keyword}+'&page=' + ${pageResult.currPage+2}+'&orderBy='+${orderBy==null?'':orderBy}}"
+														th:text="${pageResult.currPage +2}">1</a></th:block>
+												<a
+													th:href="@{${pageResult.currPage>=pageResult.totalPage}?'##':'/admin/goods/sale?keyword='+${keyword==null?'':keyword}+'&page=' + ${pageResult.currPage+1}+'&orderBy='+${orderBy==null?'':orderBy}}">
+													次ページ>
+												</a>
+									</span>
+								</th:block>
+							</div>
+                    </div><!-- /.card-body -->
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!--あいまい検索keyword-->
+    <ul id ="searchResultUl">
+		 <li class="dumyLi searchLi">
+		     <a>
+		           link
+		     </a>
+		 </li>
+    </ul>
+	        </div>
+<!--2021/05/23 modal niu -->
+ <div id="modal-main">
+<div class="button open"> </div>
+<div class="modal" id="campaignSaleModal" tabindex="-1" role="dialog" aria-labelledby="campaignSaleModalLabel">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+				aria-hidden="true">&times;</span></button>
+		<h6 class="modal-title" id="categoryModalLabel">Modal</h6>
+	</div>
+	<div class="modal_bg"> </div>
+	<div class="modal_window" id="campaignSaleModal">
+　　　　<h3>新規追加</h3>
+		<div class="form-group">
+			<label for="Name" class="control-label">Name</label>
+			<input type="text" class="form-control" id="campaignSaleName" name="Name"
+				placeholder="Nameを入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="startDate" class="control-label">開始時間</label>
+			<input type="date" class="form-control" id="startDateSale" name="categoryRank"
+				placeholder="startDateを入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="endDate" class="control-label">終了時間</label>
+			<input type="date" class="form-control" id="endDateSale" name="categoryRank" placeholder="endDateを入力してください"
+				required="true">
+		</div>
+		<div class="form-group">
+			<label for="Campaign" class="control-label">Campaign</label>
+			<input type="text" class="form-control" id="campaignSale" name="Campaign"
+				placeholder="Campaignを入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="Content1" class="control-label">Content1</label>
+			<input type="text" class="form-control" id="content1Sale" name="Content1"
+				placeholder="Content1を入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="Content2" class="control-label">Content2</label>
+			<input type="text" class="form-control" id="content2Sale" name="Content2"
+				placeholder="Content2を入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="Content3" class="control-label">Content3</label>
+			<input type="text" class="form-control" id="content3Sale" name="Content3"
+				placeholder="Content3を入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="Content4" class="control-label">Content4</label>
+			<input type="text" class="form-control" id="content4Sale" name="Content4"
+				placeholder="Content4を入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="Content5" class="control-label">Content5</label>
+			<input type="text" class="form-control" id="content5Sale" name="Content5"
+				placeholder="Content5を入力してください" required="true">
+		</div>
+		<div class="form-group">
+			<label for="flag" class="control-label">flag</label>
+			<input type="text" class="form-control" id="flagSale" name="flag"
+				placeholder="flagを入力してください" required="true">
+		</div>
+
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" id="datequxiao">キャンセル</button>
+			<button type="button" class="btn btn-primary" id="saveSaleButton">確認</button>
+		</div>
+	</div>
+</div>
+</div>
+	    <!-- #contents START -->
+	  <div id="contents">
+	  </div>
+    <!-- /.content-wrapper -->
+    <!-- 引入页脚footer-fragment -->
+    <div th:replace="admin/footer::footer-fragment"></div>
+
+<!-- jQuery -->
+<script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/admin/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/admin/dist/js/adminlte.min.js}"></script>
+<!-- sweetalert -->
+<script th:src="@{/admin/plugins/sweetalert/sweetalert.min.js}"></script>
+<!-- ajaxupload -->
+<script th:src="@{/admin/plugins/ajaxupload/ajaxupload.js}"></script>
+<!-- wangEditor -->
+<script type="text/javascript" src="//unpkg.com/wangeditor/dist/wangEditor.min.js"></script>
+<script th:src="@{/admin/dist/js/public.js}"></script>
+<script th:src="@{/admin/dist/js/goodsSale.js}"></script>
+<link rel="stylesheet" th:href="@{/admin/dist/css/goodsSale.css}">
+
+</body>
+<script>
+/* 时间 */
+function time() {
+  t_div = document.getElementById('showtime');
+  var now = new Date()
+  t_div.innerHTML = now.getFullYear() + "/" + (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds() + "";
+  setTimeout(time, 1000);
+}
+</script>
+<!--————————————————
+版权声明：本文为CSDN博主「北极光之夜。」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/luo1831251387/article/details/110846526-->
+</html>

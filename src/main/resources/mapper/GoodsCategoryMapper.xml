@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.newbee.mall.dao.GoodsCategoryMapper">
+    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.GoodsCategory">
+        <id column="category_id" jdbcType="BIGINT" property="categoryId"/>
+        <result column="category_level" jdbcType="TINYINT" property="categoryLevel"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="category_rank" jdbcType="INTEGER" property="categoryRank"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_user" jdbcType="INTEGER" property="createUser"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    category_id, category_level, parent_id, category_name, category_rank, is_deleted, 
+    create_time, create_user, update_time, update_user
+  </sql>
+    <select id="findGoodsCategoryList" parameterType="Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_newbee_mall_goods_category
+        <where>
+            <if test="categoryLevel!=null and categoryLevel!=''">
+                and category_level = #{categoryLevel}
+            </if>
+            <if test="parentId!=null and parentId!=''">
+                and parent_id = #{parentId}
+            </if>
+            and is_deleted = 0
+        </where>
+        order by category_rank desc
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+    <select id="getTotalGoodsCategories" parameterType="Map" resultType="int">
+        select count(*) from tb_newbee_mall_goods_category
+        <where>
+            <if test="categoryLevel!=null and categoryLevel!=''">
+                and category_level = #{categoryLevel}
+            </if>
+            <if test="parentId!=null and parentId!=''">
+                and parent_id = #{parentId}
+            </if>
+            and is_deleted = 0
+        </where>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_newbee_mall_goods_category
+        where category_id = #{categoryId,jdbcType=BIGINT} and is_deleted=0
+    </select>
+    <select id="selectByLevelAndName" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_newbee_mall_goods_category
+        where category_name = #{categoryName,jdbcType=VARCHAR} and category_level = #{categoryLevel,jdbcType=TINYINT}
+        and is_deleted = 0 limit 1
+    </select>
+    <select id="selectByLevelAndParentIdsAndNumber" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_newbee_mall_goods_category
+        where parent_id in
+        <foreach item="parentId" collection="parentIds" open="(" separator="," close=")">
+            #{parentId,jdbcType=BIGINT}
+        </foreach>
+        and category_level = #{categoryLevel,jdbcType=TINYINT}
+        and is_deleted = 0
+        order by category_rank desc
+        <if test="number>0">
+            limit #{number}
+        </if>
+    </select>
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    update tb_newbee_mall_goods_category set is_deleted=1
+    where category_id = #{categoryId,jdbcType=BIGINT} and is_deleted=0
+  </update>
+    <update id="deleteBatch">
+        update tb_newbee_mall_goods_category
+        set is_deleted=1 where category_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <insert id="insert" parameterType="ltd.newbee.mall.entity.GoodsCategory">
+    insert into tb_newbee_mall_goods_category (category_id, category_level, parent_id, 
+      category_name, category_rank, is_deleted, 
+      create_time, create_user, update_time, 
+      update_user)
+    values (#{categoryId,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{parentId,jdbcType=BIGINT}, 
+      #{categoryName,jdbcType=VARCHAR}, #{categoryRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{updateUser,jdbcType=INTEGER})
+  </insert>
+    <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.GoodsCategory">
+        insert into tb_newbee_mall_goods_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">
+                category_id,
+            </if>
+            <if test="categoryLevel != null">
+                category_level,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="categoryName != null">
+                category_name,
+            </if>
+            <if test="categoryRank != null">
+                category_rank,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createUser != null">
+                create_user,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateUser != null">
+                update_user,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryLevel != null">
+                #{categoryLevel,jdbcType=TINYINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryName != null">
+                #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryRank != null">
+                #{categoryRank,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.GoodsCategory">
+        update tb_newbee_mall_goods_category
+        <set>
+            <if test="categoryLevel != null">
+                category_level = #{categoryLevel,jdbcType=TINYINT},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryName != null">
+                category_name = #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryRank != null">
+                category_rank = #{categoryRank,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                create_user = #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser,jdbcType=INTEGER},
+            </if>
+        </set>
+        where category_id = #{categoryId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="ltd.newbee.mall.entity.GoodsCategory">
+    update tb_newbee_mall_goods_category
+    set category_level = #{categoryLevel,jdbcType=TINYINT},
+      parent_id = #{parentId,jdbcType=BIGINT},
+      category_name = #{categoryName,jdbcType=VARCHAR},
+      category_rank = #{categoryRank,jdbcType=INTEGER},
+      is_deleted = #{isDeleted,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=INTEGER}
+    where category_id = #{categoryId,jdbcType=BIGINT}
+  </update>
+  <!-- category -->
+     <select id="getTbSale" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.TbSale">
+	       select id,goods_id,start_date,end_date from tb_sale
+	       where goods_id = #{goodsId,jdbcType=BIGINT}
+	   </select>
+	   <select id="getTbCategory" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.TbCategory">
+	       select id,category_id,start_date,end_date from tb_category
+		   where category_id = #{categoryId,jdbcType=BIGINT}
+	   </select>    
+      <select id="findCategoryId" parameterType="Map" resultMap="BaseResultMap">
+        select  category_id, category_level, parent_id, category_name, category_rank, is_deleted, 
+        create_time, create_user, update_time, update_user from tb_newbee_mall_goods_category
+        where parent_id = 0
+     </select>
+     <select id="getTbsaleGoods" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.TbSale">
+		select n.id,n.name,n.start_date,n.end_date,n.campaign,n.content1,n.content2,n.content3,n.content4,n.content5,n.flag,m.id,m.goods_id,m.start_date,m.end_date from goods_sale as n join tb_sale as m on n.id = m.id 
+		    where n.id = #{id,jdbcType=BIGINT}
+      </select>
+      <select id="getCategoryGoods" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.TbCategory">
+		select n.id,n.name,n.start_date,n.end_date,n.campaign,n.content1,n.content2,n.content3,n.content4,n.content5,n.flag,m.id,m.category_id,m.start_date,m.end_date from goods_sale as n join tb_categry as m on n.id = m.id 
+		    where n.id = #{id,jdbcType=BIGINT}
+      </select>
+    <!--   2021/05/30 categoryId name  -->
+       <select id="getCategoryIdAndName" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.CategoryIdAndId">
+			select n.category_id,n.category_name,n.parent_id,m.id,m.category_id,m.start_date,m.end_date
+            from tb_newbee_mall_goods_category as n left join tb_category as m on n.category_id = m.category_id where parent_id = 0
+      </select>
+      <delete id="deletePaK" parameterType="java.lang.Long">
+          delete from tb_category where category_id = #{categoryId,jdbcType=BIGINT}
+     </delete>
+      <select id="getCampaignSet" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.CampaignSet">
+		select id,campagin_id,primary_goods_id,category_id,sub_goods_id,start_date,end_date from campaign_set where id = #{id,jdbcType=BIGINT}
+      </select>
+         <insert id="insertCampaignSet" parameterType="java.lang.Long">
+        insert into campaign_set
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="campaginId != null">
+                campagin_id,
+            </if>                 
+            <if test="primaryGoodsId != null">
+                primary_goods_id,
+            </if>
+             <if test="categoryId != null">
+                category_id,
+            </if>
+             <if test="subGoodsId != null">
+                sub_goods_id,
+            </if>
+             <if test="startDate != null">
+                start_date,
+            </if>
+             <if test="endDate != null">
+                end_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="campaginId != null">
+                #{campaginId,jdbcType=BIGINT},
+            </if>   
+            <if test="primaryGoodsId != null">
+                #{primaryGoodsId,jdbcType=BIGINT},
+            </if>     
+              <if test="categoryId != null">
+                #{categoryId,jdbcType=BIGINT},
+            </if>     
+             <if test="subGoodsId != null">
+                #{subGoodsId,jdbcType=BIGINT},
+            </if>     
+             <if test="startDate != null">
+                #{startDate,jdbcType=TIMESTAMP},
+            </if>       
+            <if test="endDate != null">
+                #{endDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert> 
+        <select id="getCampaignMaxId" parameterType="java.lang.Long" resultType= "java.lang.Long">			   
+			select max(id) from campaign_set		  
+	 </select> 
+	 <select id="getSecondCategoryIdAndName" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.CategoryIdAndId">
+			select n.category_id,n.category_name,n.parent_id,m.id,m.category_id,m.start_date,m.end_date
+            from tb_newbee_mall_goods_category as n left join tb_category as m on n.category_id = m.category_id where parent_id = #{parentId,jdbcType=BIGINT}
+     </select>
+      <select id="getPrice" parameterType="java.lang.Long" resultType="ltd.newbee.mall.entity.Price">
+           select n.category_id,n.parent_id,n.category_level,u.goods_id,u.goods_category_id
+           from tb_newbee_mall_goods_category as n join tb_newbee_mall_goods_info as u on n.category_id=u.goods_category_id 
+           where n.category_id =#{categoryId,jdbcType=BIGINT}
+     </select>
+    <!--  2021/06/19 -->
+        <delete id="deleteTbsale" parameterType="java.lang.Long">
+          delete tb_sale,campaign_set from tb_sale LEFT JOIN campaign_set ON tb_sale.goods_id = campaign_set.primary_goods_id WHERE tb_sale.goods_id=#{goodsId,jdbcType=BIGINT}
+     </delete>
+   <!--    <delete id="deleteCampSet" parameterType="java.lang.Long">
+          delete from campaign_set where id = #{id,jdbcType=BIGINT}
+     </delete> -->
+</mapper>
